@@ -5,10 +5,15 @@ build-backend = "hatchling.build"
 [project]
 name = "mathplot"
 version = "0.1.0"
-description = "A lightweight package for plotting mathematical functions and sequences."
+description = "Plotting helpers and math utilities for experiments."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "gmpy2>=2.3.0",
     "matplotlib>=3.10.8",
     "numpy>=2.4.3",
+    "pyprimesieve>=0.1.6",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mathplot", "mathlab"]
