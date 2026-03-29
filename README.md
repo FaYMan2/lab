@@ -3,7 +3,7 @@
 This project now includes two lightweight Python packages:
 
 - `mathplot` for plotting mathematical functions, sequences, and growth-rate experiments.
-- `mathlab` for small, easy-to-use math utilities built from external packages and internal helpers.
+- `mathlab` for small, direct math utilities built on top of a few external packages.
 
 ## `mathplot` helpers
 
@@ -28,29 +28,28 @@ See `examples/example_usage.py` for a fuller walkthrough.
 
 ## `mathlab` helpers
 
-- `PrimeUtils` groups the prime-related helpers in one place.
 - `generate_primes(start, end)` returns the primes in an inclusive range.
 - `nth_prime(n)` returns the nth prime number.
 - `next_prime(value)` returns the next prime after a value.
 - `previous_prime(value)` returns the previous prime before a value.
-- `intersection(list1, list2, ..., listn)` returns common values in first-list order.
-- `union(list1, list2, ..., listn)` returns unique values in first-seen order.
 - `is_prime(value)` checks primality with `gmpy2`.
+- `get_prime_factors(value)` returns the prime factors with multiplicity.
+- `get_factors(value)` returns all factors of a positive integer.
 - `is_palindrome(value)` accepts either an `int` or a `str`.
+- `is_square(value)` checks whether an integer is a perfect square.
 
 `generate_primes(...)` uses `pyprimesieve`, while the other prime helpers use `gmpy2`.
+`PrimeUtils` and `CheckUtils` still exist as compatibility wrappers, but the direct functions are the intended interface.
 
 ## `mathlab` example
 
 ```python
-from mathlab import PrimeUtils, intersection, is_palindrome, union
+from mathlab import generate_primes, is_palindrome, is_prime, next_prime, nth_prime
 
-print(PrimeUtils.generate_primes(10, 30))
-print(PrimeUtils.nth_prime(5))
-print(PrimeUtils.next_prime(97))
-print(intersection([1, 2, 3], [2, 3, 4], [0, 3, 2]))
-print(union([1, 2], [2, 3], [3, 4]))
-print(PrimeUtils.is_prime(97))
+print(generate_primes(10, 30))
+print(nth_prime(5))
+print(next_prime(97))
+print(is_prime(97))
 print(is_palindrome("racecar"))
 ```
 

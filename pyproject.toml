@@ -7,7 +7,7 @@ name = "mathplot"
 version = "0.1.0"
 description = "Plotting helpers and math utilities for experiments."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "gmpy2>=2.3.0",
     "matplotlib>=3.10.8",

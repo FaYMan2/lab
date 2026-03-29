@@ -1,94 +1,124 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from functools import lru_cache
 from typing import SupportsInt, cast
 
 import gmpy2
 import pyprimesieve
 
+_is_prime_impl = cast(Callable[[int], object], getattr(gmpy2, "is_prime"))
+_next_prime_impl = cast(Callable[[int], SupportsInt], getattr(gmpy2, "next_prime"))
+_previous_prime_impl = cast(Callable[[int], SupportsInt], getattr(gmpy2, "prev_prime"))
+
+
+def _require_int(value: int, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError(f"{name} must be an integer.")
+    return value
+
+
+def generate_primes(start: int, end: int) -> list[int]:
+    """Return primes in the inclusive range [start, end]."""
+    start = _require_int(start, "start")
+    end = _require_int(end, "end")
+
+    if end < start:
+        raise ValueError("end must be >= start")
+    if end < 2:
+        return []
+
+    primes = list(pyprimesieve.primes(max(2, start), end + 1))
+    print(f"Generated {len(primes)} primes in range [{start}, {end}]")
+    return primes
+
+
+def is_prime(value: int) -> bool:
+    """Return True if value is prime."""
+    value = _require_int(value, "value")
+    return value >= 2 and bool(_is_prime_impl(value))
+
+
+def next_prime(value: int) -> int:
+    """Return smallest prime strictly greater than value."""
+    value = _require_int(value, "value")
+    return int(_next_prime_impl(value))
+
+
+def previous_prime(value: int) -> int:
+    """Return largest prime smaller than value."""
+    value = _require_int(value, "value")
+    if value < 3:
+        raise ValueError("value must be >= 3")
+    return int(_previous_prime_impl(value))
+
+
+def nth_prime(n: int) -> int:
+    """Return the nth prime number."""
+    n = _require_int(n, "n")
+    if n < 1:
+        raise ValueError("n must be >= 1")
+
+    prime = 1
+    for _ in range(n):
+        prime = int(_next_prime_impl(prime))
+    return prime
+
+
+@lru_cache(maxsize=10_000)
+def _factorize(value: int) -> tuple[tuple[int, int], ...]:
+    """Return prime factorization as (prime, exponent)."""
+    return tuple((int(prime), int(power)) for prime, power in pyprimesieve.factorize(value))
+
+
+def get_prime_factors(value: int) -> list[int]:
+    """Return all prime factors with multiplicity."""
+    value = _require_int(value, "value")
+    if value < 2:
+        raise ValueError("value must be >= 2")
+
+    factors: list[int] = []
+    for prime, power in _factorize(value):
+        factors.extend([prime] * power)
+    return factors
+
+
+def get_factors(value: int) -> list[int]:
+    """Return all factors of the number."""
+    value = _require_int(value, "value")
+    if value < 1:
+        raise ValueError("value must be >= 1")
+
+    factors = [1]
+    for prime, power in _factorize(value):
+        current: list[int] = []
+        for exponent in range(1, power + 1):
+            prime_power = prime**exponent
+            current.extend(factor * prime_power for factor in factors)
+        factors.extend(current)
+
+    return sorted(factors)
+
+
 class PrimeUtils:
+    """Compatibility wrapper around the module-level prime helpers."""
 
-    _is_prime_impl = cast(Callable[[int], object], getattr(gmpy2, "is_prime"))
-    _next_prime_impl = cast(Callable[[int], SupportsInt], getattr(gmpy2, "next_prime"))
-    _previous_prime_impl = cast(
-        Callable[[int], SupportsInt], getattr(gmpy2, "prev_prime")
-    )
+    generate_primes = staticmethod(generate_primes)
+    is_prime = staticmethod(is_prime)
+    next_prime = staticmethod(next_prime)
+    previous_prime = staticmethod(previous_prime)
+    nth_prime = staticmethod(nth_prime)
+    get_factors = staticmethod(get_factors)
+    get_prime_factors = staticmethod(get_prime_factors)
 
-    @staticmethod
-    def _validate_integer(value: int, name: str) -> int:
-        """Validate integer inputs while rejecting booleans."""
-        if isinstance(value, bool) or not isinstance(value, int):
-            raise TypeError(f"{name} must be an integer.")
-        return value
-
-    @staticmethod
-    def _call_bool(function: Callable[[int], object], value: int) -> bool:
-        return bool(function(value))
-
-    @staticmethod
-    def _call_int(function: Callable[[int], SupportsInt], value: int) -> int:
-        return int(function(value))
-
-    @classmethod
-    def generate_primes(cls, start: int, end: int) -> list[int]:
-        """Return the primes in the inclusive range [start, end]."""
-        start = cls._validate_integer(start, "start")
-        end = cls._validate_integer(end, "end")
-        if end < start:
-            raise ValueError("end must be greater than or equal to start.")
-        if end < 2:
-            return []
-
-        lower = max(2, start)
-        return list(pyprimesieve.primes(lower, end + 1))
-
-    @classmethod
-    def is_prime(cls, value: int) -> bool:
-        """Return True when the given integer is prime."""
-        value = cls._validate_integer(value, "value")
-        if value < 2:
-            return False
-        return cls._call_bool(cls._is_prime_impl, value)
-
-    @classmethod
-    def next_prime(cls, value: int) -> int:
-        """Return the smallest prime strictly greater than value."""
-        value = cls._validate_integer(value, "value")
-        return cls._call_int(cls._next_prime_impl, value)
-
-    @classmethod
-    def previous_prime(cls, value: int) -> int:
-        """Return the largest prime smaller than value."""
-        value = cls._validate_integer(value, "value")
-        if value < 3:
-            raise ValueError("value must be greater than or equal to 3.")
-        return cls._call_int(cls._previous_prime_impl, value)
-
-    @classmethod
-    def nth_prime(cls, n: int) -> int:
-        """Return the nth prime number."""
-        n = cls._validate_integer(n, "n")
-        if n < 1:
-            raise ValueError("n must be greater than or equal to 1.")
-
-        prime = 1
-        for _ in range(n):
-            prime = cls._call_int(cls._next_prime_impl, prime)
-        return prime
-
-
-generate_primes = PrimeUtils.generate_primes
-is_prime = PrimeUtils.is_prime
-next_prime = PrimeUtils.next_prime
-previous_prime = PrimeUtils.previous_prime
-nth_prime = PrimeUtils.nth_prime
 
 __all__ = [
-    "PrimeUtils",
     "generate_primes",
     "is_prime",
     "next_prime",
     "previous_prime",
     "nth_prime",
+    "get_factors",
+    "get_prime_factors",
+    "PrimeUtils",
 ]
-
