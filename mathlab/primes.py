@@ -77,10 +77,10 @@ def get_prime_factors(value: int) -> list[int]:
     if value < 2:
         raise ValueError("value must be >= 2")
 
-    factors: list[int] = []
+    factors: set[int] = set()
     for prime, power in _factorize(value):
-        factors.extend([prime] * power)
-    return factors
+        factors.update([prime] * power)
+    return list(factors)
 
 
 def get_factors(value: int) -> list[int]:
