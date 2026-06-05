@@ -22,12 +22,24 @@ def is_square(value: int) -> bool:
     root = math.isqrt(value)
     return root * root == value
 
+def is_cube(value: int) -> bool:
+    """Return True when the given integer is a perfect cube."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError("value must be an integer.")
+
+    if value < 0:
+        root = round(-(-value) ** (1/3))
+        return root * root * root == value
+    else:
+        root = round(value ** (1/3))
+        return root * root * root == value
+
 
 class CheckUtils:
     """Compatibility wrapper around the module-level check helpers."""
 
     is_palindrome = staticmethod(is_palindrome)
     is_square = staticmethod(is_square)
-
+    is_cube = staticmethod(is_cube)
 
 __all__ = ["is_palindrome", "is_square", "CheckUtils"]

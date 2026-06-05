@@ -1,6 +1,6 @@
 """Easy-to-use math helpers for experiments and lab work."""
 
-from .checks import CheckUtils, is_palindrome, is_square
+from .checks import CheckUtils, is_palindrome, is_square, is_cube
 from .primes import (
     PrimeUtils,
     generate_primes,
@@ -24,5 +24,6 @@ __all__ = [
     "is_square",
     "PrimeUtils",
     "CheckUtils",
+    "is_cube"
 ]
 __version__ = "0.1.0"
