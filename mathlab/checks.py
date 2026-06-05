@@ -4,42 +4,28 @@ import math
 
 
 def is_palindrome(value: int | str) -> bool:
-    """Return True when the given integer or string reads the same backwards."""
-    if isinstance(value, bool) or not isinstance(value, (int, str)):
-        raise TypeError("value must be an int or str.")
+    """Return True when the value reads the same backwards.
 
+    Integers are compared by their decimal digit representation.
+    """
     text = str(value)
     return text == text[::-1]
 
 
 def is_square(value: int) -> bool:
     """Return True when the given integer is a perfect square."""
-    if isinstance(value, bool) or not isinstance(value, int):
-        raise TypeError("value must be an integer.")
     if value < 0:
         return False
-
     root = math.isqrt(value)
     return root * root == value
 
+
 def is_cube(value: int) -> bool:
     """Return True when the given integer is a perfect cube."""
-    if isinstance(value, bool) or not isinstance(value, int):
-        raise TypeError("value must be an integer.")
-
-    if value < 0:
-        root = round(-(-value) ** (1/3))
-        return root * root * root == value
-    else:
-        root = round(value ** (1/3))
-        return root * root * root == value
+    magnitude = abs(value)
+    root = round(magnitude ** (1 / 3))
+    # Guard against float-rounding near integer boundaries for large inputs.
+    return any(candidate**3 == magnitude for candidate in (root - 1, root, root + 1))
 
 
-class CheckUtils:
-    """Compatibility wrapper around the module-level check helpers."""
-
-    is_palindrome = staticmethod(is_palindrome)
-    is_square = staticmethod(is_square)
-    is_cube = staticmethod(is_cube)
-
-__all__ = ["is_palindrome", "is_square", "CheckUtils"]
+__all__ = ["is_palindrome", "is_square", "is_cube"]

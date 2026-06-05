@@ -1,8 +1,7 @@
 """Easy-to-use math helpers for experiments and lab work."""
 
-from .checks import CheckUtils, is_palindrome, is_square, is_cube
+from .checks import is_cube, is_palindrome, is_square
 from .primes import (
-    PrimeUtils,
     generate_primes,
     get_factors,
     get_prime_factors,
@@ -14,16 +13,14 @@ from .primes import (
 
 __all__ = [
     "generate_primes",
+    "get_factors",
+    "get_prime_factors",
+    "is_cube",
+    "is_palindrome",
     "is_prime",
+    "is_square",
     "next_prime",
     "nth_prime",
     "previous_prime",
-    "get_factors",
-    "get_prime_factors",
-    "is_palindrome",
-    "is_square",
-    "PrimeUtils",
-    "CheckUtils",
-    "is_cube"
 ]
 __version__ = "0.1.0"

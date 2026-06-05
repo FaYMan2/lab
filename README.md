@@ -33,13 +33,13 @@ See `examples/example_usage.py` for a fuller walkthrough.
 - `next_prime(value)` returns the next prime after a value.
 - `previous_prime(value)` returns the previous prime before a value.
 - `is_prime(value)` checks primality with `gmpy2`.
-- `get_prime_factors(value)` returns the prime factors with multiplicity.
+- `get_prime_factors(value)` returns the unique prime factors in ascending order.
 - `get_factors(value)` returns all factors of a positive integer.
-- `is_palindrome(value)` accepts either an `int` or a `str`.
+- `is_palindrome(value)` accepts either an `int` or a `str`; integers are compared by their decimal digits.
 - `is_square(value)` checks whether an integer is a perfect square.
+- `is_cube(value)` checks whether an integer is a perfect cube (handles negatives).
 
 `generate_primes(...)` uses `pyprimesieve`, while the other prime helpers use `gmpy2`.
-`PrimeUtils` and `CheckUtils` still exist as compatibility wrappers, but the direct functions are the intended interface.
 
 ## `mathlab` example
 
