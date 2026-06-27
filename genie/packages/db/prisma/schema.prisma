@@ -1,0 +1,81 @@
+// Genie persistence: installations, per-repo config, demo runs, and the
+// admin-editable model routing overrides.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A GitHub App installation (one per org/user that installed Genie).
+model Installation {
+  id             String   @id @default(cuid())
+  githubId       BigInt   @unique // GitHub's installation id
+  account        String // login of the org/user
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  repos          Repo[]
+  routingRules   RoutingRule[]
+}
+
+/// A repository Genie is active on.
+model Repo {
+  id             String   @id @default(cuid())
+  installation   Installation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  installationId String
+  owner          String
+  name           String
+  /// Whether Genie is enabled for this repo (admin toggle).
+  enabled        Boolean  @default(true)
+  runs           Run[]
+  routingRules   RoutingRule[]
+  createdAt      DateTime @default(now())
+
+  @@unique([owner, name])
+}
+
+/// One demo attempt for a PR head SHA.
+model Run {
+  id           String   @id @default(cuid())
+  repo         Repo     @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  repoId       String
+  prNumber     Int
+  headSha      String
+  status       String // RunStatus from @genie/config
+  /// Triage verdict + extracted flows (TriageResult JSON).
+  triage       Json?
+  /// The Playwright source that actually recorded the demo.
+  script       String?
+  /// Public URLs of the produced media.
+  gifUrl       String?
+  mp4Url       String?
+  /// Free-text reason when status = skipped | failed.
+  detail       String?
+  /// Total input/output tokens + estimated cost, by task.
+  usage        Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([repoId, prNumber])
+}
+
+/// Admin-editable model routing. The most specific matching rule wins:
+/// repo-scoped > installation-scoped > env default (no row).
+model RoutingRule {
+  id             String   @id @default(cuid())
+  task           String // TaskKind
+  /// "<provider>:<model>"
+  modelRef       String
+  installation   Installation? @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  installationId String?
+  repo           Repo?    @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  repoId         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([task, installationId, repoId])
+}

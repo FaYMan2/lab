@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.log
+
+# env
+.env
+.env.local
+*.local
+
+# generated
+packages/db/src/generated/
+**/playwright-report/
+**/test-results/
+
+# genie runtime artifacts
+.genie-runs/
+*.webm
+*.mp4
+*.gif

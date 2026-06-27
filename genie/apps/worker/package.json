@@ -1,0 +1,26 @@
+{
+  "name": "@genie/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@genie/ai": "workspace:*",
+    "@genie/config": "workspace:*",
+    "@genie/core": "workspace:*",
+    "@genie/db": "workspace:*",
+    "@genie/github": "workspace:*",
+    "@genie/queue": "workspace:*",
+    "@genie/recorder": "workspace:*",
+    "bullmq": "^5.34.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

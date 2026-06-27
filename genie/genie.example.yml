@@ -1,0 +1,31 @@
+# Drop this file in your repo root as `genie.yml` to tell Genie how to run your app.
+# Everything is optional — Genie auto-detects sensible defaults from package.json
+# when a field is missing. Values are evaluated for the PR's head commit.
+
+app:
+  # Commands run from the repo root inside an ephemeral, network-isolated container.
+  install: "pnpm install --frozen-lockfile"
+  build: "pnpm build"          # optional; skipped if empty
+  start: "pnpm dev"            # long-running; Genie waits for `healthcheck` to pass
+  # The base URL Playwright points at once the app is up.
+  baseUrl: "http://localhost:3000"
+  # Genie polls this until it returns 2xx (or reuses baseUrl if omitted).
+  healthcheck: "http://localhost:3000"
+  startTimeoutSeconds: 120
+  env:
+    NODE_ENV: development
+
+# Optional: a deterministic logged-in state so demos start authenticated.
+# `seed` runs once after the app is healthy; `storageState` is a Playwright
+# storage-state JSON committed to the repo, applied to the browser context.
+auth:
+  seed: ""                     # e.g. "pnpm db:seed"
+  storageState: ""             # e.g. ".genie/auth.json"
+
+# Optional knobs.
+record:
+  viewport: { width: 1280, height: 720 }
+  # Skip Genie entirely for PRs whose title matches any of these (regex).
+  skipTitlePatterns:
+    - "^chore"
+    - "^\\[skip genie\\]"
